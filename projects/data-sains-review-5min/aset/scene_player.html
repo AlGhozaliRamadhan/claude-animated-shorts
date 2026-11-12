@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Scene 1 & 2 - Data Science Review</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    background: #0B0E14;
+    color: #FFFFFF;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    overflow: hidden;
+    width: 1920px;
+    height: 1080px;
+    position: relative;
+    user-select: none;
+}
+
+#canvas3d {
+    position: absolute;
+    top: 0; left: 0;
+    width: 1920px; height: 1080px;
+    z-index: 1;
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 1920px; height: 1080px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Technical HUD & Grid overlays */
+.hud-corner-tl {
+    position: absolute;
+    top: 40px; left: 60px;
+    font-family: 'Consolas', monospace;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.hud-dot {
+    width: 8px; height: 8px;
+    background: #00F0FF;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00F0FF;
+    animation: pulseDot 2s infinite ease-in-out;
+}
+@keyframes pulseDot {
+    0%, 100% { opacity: 0.4; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+.hud-corner-tr {
+    position: absolute;
+    top: 40px; right: 60px;
+    font-family: 'Consolas', monospace;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    color: #94A3B8;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 8px 18px;
+    border-radius: 4px;
+    backdrop-filter: blur(8px);
+}
+
+/* === SCENE 1 CARDS === */
+#scene1-container {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease;
+}
+
+.cards-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    position: relative;
+}
+
+.metric-card {
+    width: 460px;
+    height: 320px;
+    background: rgba(11, 17, 28, 0.75);
+    border-radius: 12px;
+    padding: 36px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(16px);
+    transform: translateY(40px) scale(0.95);
+    opacity: 0;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.metric-card.show {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.card-hybrid {
+    border: 1px solid rgba(0, 240, 255, 0.5);
+    box-shadow: 0 0 35px rgba(0, 240, 255, 0.15), inset 0 0 25px rgba(0, 240, 255, 0.05);
+}
+
+.card-baseline {
+    border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.card-header {
+    font-family: 'Consolas', monospace;
+    font-size: 15px;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.card-hybrid .card-header { color: #00F0FF; }
+.card-baseline .card-header { color: #94A3B8; }
+
+.main-metric {
+    margin: 15px 0;
+}
+.metric-label {
+    font-size: 16px;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 4px;
+}
+.metric-val {
+    font-size: 72px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1;
+}
+.card-hybrid .metric-val {
+    color: #00F0FF;
+    text-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+}
+.card-baseline .metric-val {
+    color: #FFFFFF;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.sub-metric {
+    font-family: 'Consolas', monospace;
+    font-size: 20px;
+    color: #94A3B8;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* 5x badge */
+.badge-5x {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 90px;
+    height: 90px;
+    background: #00F0FF;
+    color: #0B0E14;
+    font-weight: 900;
+    font-size: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 40px rgba(0, 240, 255, 0.8);
+    opacity: 0;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+    z-index: 20;
+}
+.badge-5x.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+/* Glitch effect on baseline card */
+.glitch-active {
+    animation: glitchShake 0.15s infinite;
+    border-color: #FF3B30 !important;
+    box-shadow: 0 0 40px rgba(255, 59, 48, 0.4), inset 0 0 20px rgba(255, 59, 48, 0.2) !important;
+}
+.glitch-active .metric-val {
+    color: #FF3B30 !important;
+    text-shadow: 0 0 25px rgba(255, 59, 48, 0.8) !important;
+}
+@keyframes glitchShake {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-3px, 2px); }
+    50% { transform: translate(3px, -2px); }
+    75% { transform: translate(-2px, -2px); }
+    100% { transform: translate(2px, 3px); }
+}
+
+.warning-callout {
+    position: absolute;
+    bottom: -60px;
+    left: 0;
+    right: 0;
+    background: rgba(255, 59, 48, 0.15);
+    border: 1px solid #FF3B30;
+    color: #FF6B6B;
+    font-family: 'Consolas', monospace;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    padding: 8px 14px;
+    border-radius: 4px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.warning-callout.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* === SCENE 2 ELEMENTS === */
+#scene2-container {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 100px 140px 80px 140px;
+}
+
+.paper-header {
+    transform: translateY(-20px);
+    opacity: 0;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+}
+.paper-tag {
+    font-family: 'Consolas', monospace;
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: #00F0FF;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+.paper-title {
+    font-size: 38px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #FFFFFF;
+    margin-bottom: 6px;
+}
+.paper-meta {
+    font-size: 18px;
+    color: #94A3B8;
+}
+
+.question-box {
+    margin: 40px 0;
+    padding: 44px 50px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(0, 240, 255, 0.35);
+    border-left: 5px solid #00F0FF;
+    border-radius: 8px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+    transform: scale(0.96);
+    opacity: 0;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+}
+.q-lead {
+    font-family: 'Consolas', monospace;
+    font-size: 13px;
+    letter-spacing: 2.5px;
+    color: #00F0FF;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+}
+.q-title {
+    font-size: 44px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: -0.5px;
+    line-height: 1.25;
+}
+
+.nav-timeline {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+}
+.nav-step {
+    flex: 1;
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 8px;
+    padding: 18px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    backdrop-filter: blur(10px);
+    transition: border-color 0.4s ease, background 0.4s ease, transform 0.4s ease;
+}
+.nav-step.active {
+    border-color: #00F0FF;
+    background: rgba(0, 240, 255, 0.08);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 240, 255, 0.15);
+}
+.nav-num {
+    font-family: 'Consolas', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: #64748B;
+}
+.nav-step.active .nav-num { color: #00F0FF; }
+.nav-name {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #FFFFFF;
+}
+.nav-desc {
+    font-size: 13px;
+    color: #94A3B8;
+}
+.nav-arrow {
+    font-size: 24px;
+    color: #334155;
+    font-weight: 300;
+}
+</style>
+<script src="three.min.js"></script>
+</head>
+<body>
+
+<canvas id="canvas3d"></canvas>
+
+<div id="ui-layer">
+    <!-- Top HUD -->
+    <div class="hud-corner-tl">
+        <div class="hud-dot"></div>
+        <span>FORENSIC LAB // 15.3B.01 // NVDA: 2015-2024</span>
+    </div>
+    <div class="hud-corner-tr">
+        CRITICAL PAPER AUDIT • SYACH ET AL. (2026)
+    </div>
+
+    <!-- Scene 1 Elements -->
+    <div id="scene1-container">
+        <div class="cards-wrapper">
+            <!-- Card 1: Hybrid -->
+            <div id="card-hybrid" class="metric-card card-hybrid">
+                <div class="card-header">
+                    <span>MODEL HYBRID</span>
+                    <span>LSTM-GARCH</span>
+                </div>
+                <div class="main-metric">
+                    <div class="metric-label">Mean Absolute Error</div>
+                    <div class="metric-val">1,72</div>
+                </div>
+                <div class="sub-metric">
+                    <span>RMSE</span>
+                    <span style="color:#FFFFFF;">2,26</span>
+                </div>
+            </div>
+
+            <!-- 5x Badge -->
+            <div id="badge-5x" class="badge-5x">5×</div>
+
+            <!-- Card 2: Baseline -->
+            <div id="card-baseline" class="metric-card card-baseline">
+                <div class="card-header">
+                    <span>PEMBANDING</span>
+                    <span>LSTM MURNI</span>
+                </div>
+                <div class="main-metric">
+                    <div class="metric-label">Mean Absolute Error</div>
+                    <div class="metric-val" id="val-baseline">9,15</div>
+                </div>
+                <div class="sub-metric">
+                    <span>RMSE</span>
+                    <span>6,72</span>
+                </div>
+                <div id="warning-box" class="warning-callout">
+                    ⚠️ MUSTAHIL: MAE (9,15) > RMSE (6,72)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scene 2 Elements -->
+    <div id="scene2-container">
+        <div class="paper-header" id="paper-header">
+            <div class="paper-tag">KARYA YANG DITELAAH</div>
+            <div class="paper-title">Prediksi Harga Saham NVIDIA Menggunakan Model LSTM dan GARCH</div>
+            <div class="paper-meta">Syach, Baidawi, & Sundari (2026) • Jurnal SINTA: Vol. 3, No. 2, hlm. 71–79</div>
+        </div>
+
+        <div class="question-box" id="question-box">
+            <div class="q-lead">PERTANYAAN PANDUAN REVIEW</div>
+            <div class="q-title">“Does GARCH volatility truly improve LSTM accuracy?”</div>
+        </div>
+
+        <div class="nav-timeline" id="nav-timeline">
+            <div class="nav-step active">
+                <span class="nav-num">LANGKAH 01</span>
+                <span class="nav-name">KONSEP</span>
+                <span class="nav-desc">GARCH + LSTM Dual-Engine</span>
+            </div>
+            <span class="nav-arrow">→</span>
+            <div class="nav-step">
+                <span class="nav-num">LANGKAH 02</span>
+                <span class="nav-name">METODE</span>
+                <span class="nav-desc">Split 80:20 Kronologis</span>
+            </div>
+            <span class="nav-arrow">→</span>
+            <div class="nav-step">
+                <span class="nav-num">LANGKAH 03</span>
+                <span class="nav-name">HASIL</span>
+                <span class="nav-desc">Tabel 4 & Anomali Matematika</span>
+            </div>
+            <span class="nav-arrow">→</span>
+            <div class="nav-step">
+                <span class="nav-num">LANGKAH 04</span>
+                <span class="nav-name">EVALUASI</span>
+                <span class="nav-desc">Audit Enam Celah Metodologi</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// === THREE.JS 3D SCENE SETUP ===
+const canvas = document.getElementById('canvas3d');
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x0B0E14, 0.012);
+
+const camera = new THREE.PerspectiveCamera(50, 1920/1080, 0.1, 1000);
+camera.position.set(0, 3, 12);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+renderer.setSize(1920, 1080);
+renderer.setPixelRatio(1);
+
+// 3D Infinite Grid
+const gridHelper = new THREE.GridHelper(160, 80, 0x00F0FF, 0x1E293B);
+gridHelper.position.y = -2;
+scene.add(gridHelper);
+
+// Floating ambient particles
+const particleCount = 180;
+const pGeo = new THREE.BufferGeometry();
+const pPos = new Float32Array(particleCount * 3);
+for (let i = 0; i < particleCount * 3; i += 3) {
+    pPos[i] = (Math.random() - 0.5) * 40;
+    pPos[i+1] = Math.random() * 15 - 2;
+    pPos[i+2] = (Math.random() - 0.5) * 40;
+}
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+const pMat = new THREE.PointsMaterial({ color: 0x94A3B8, size: 0.1, transparent: true, opacity: 0.6 });
+const particles = new THREE.Points(pGeo, pMat);
+scene.add(particles);
+
+// 3D Stock Chart Ribbon for Scene 2
+const chartGroup = new THREE.Group();
+chartGroup.position.set(0, -1, 0);
+chartGroup.visible = false;
+scene.add(chartGroup);
+
+// Generate stylized 3D stock curve
+const curvePoints = [];
+const candleCount = 50;
+let lastY = 0;
+for (let i = 0; i < candleCount; i++) {
+    const x = (i - candleCount / 2) * 0.45;
+    const dy = (Math.sin(i * 0.3) * 0.4) + (i > 30 ? (i - 30) * 0.12 : 0) + (Math.random() * 0.3 - 0.1);
+    lastY += dy * 0.3;
+    curvePoints.push(new THREE.Vector3(x, Math.max(0, lastY), (Math.random() - 0.5) * 0.2));
+    
+    // Add vertical bar (candlestick body)
+    const barGeo = new THREE.CylinderGeometry(0.04, 0.04, Math.max(0.2, lastY + 0.5), 8);
+    const isUp = dy >= 0;
+    const barMat = new THREE.MeshBasicMaterial({ color: isUp ? 0x00F0FF : 0x64748B, transparent: true, opacity: 0.65 });
+    const bar = new THREE.Mesh(barGeo, barMat);
+    bar.position.set(x, (lastY + 0.5) / 2, 0);
+    chartGroup.add(bar);
+}
+
+const curve = new THREE.CatmullRomCurve3(curvePoints);
+const tubeGeo = new THREE.TubeGeometry(curve, 100, 0.05, 8, false);
+const tubeMat = new THREE.MeshBasicMaterial({ color: 0x00F0FF });
+const tube = new THREE.Mesh(tubeGeo, tubeMat);
+chartGroup.add(tube);
+
+// === ANIMATION TIMELINE LOGIC ===
+const cardHybrid = document.getElementById('card-hybrid');
+const cardBaseline = document.getElementById('card-baseline');
+const badge5x = document.getElementById('badge-5x');
+const valBaseline = document.getElementById('val-baseline');
+const warningBox = document.getElementById('warning-box');
+const scene1Cont = document.getElementById('scene1-container');
+const scene2Cont = document.getElementById('scene2-container');
+const paperHeader = document.getElementById('paper-header');
+const questionBox = document.getElementById('question-box');
+const navTimeline = document.getElementById('nav-timeline');
+
+window.setTime = function(sec) {
+    // 3D Camera & Particle Motion
+    particles.rotation.y = sec * 0.02;
+    gridHelper.position.z = (sec * 0.8) % 2 - 2;
+
+    if (sec < 20.0) {
+        // === SCENE 1 (0:00 - 0:20) ===
+        chartGroup.visible = false;
+        scene1Cont.style.opacity = '1';
+        scene2Cont.style.opacity = '0';
+        
+        // Camera slow gliding push-in
+        camera.position.z = 12 - (sec * 0.15);
+        camera.position.y = 2.5 - (sec * 0.04);
+        camera.lookAt(0, 0.5, 0);
+
+        // 0:04 - Cards appear
+        if (sec >= 4.0) {
+            cardHybrid.classList.add('show');
+            cardBaseline.classList.add('show');
+        } else {
+            cardHybrid.classList.remove('show');
+            cardBaseline.classList.remove('show');
+        }
+
+        // 0:10 - 5x badge pop in
+        if (sec >= 10.0 && sec < 18.0) {
+            badge5x.classList.add('show');
+        } else {
+            badge5x.classList.remove('show');
+        }
+
+        // 0:13 - Glitch & anomaly breakdown
+        if (sec >= 13.0 && sec < 18.0) {
+            cardBaseline.classList.add('glitch-active');
+            warningBox.classList.add('show');
+            // Brief camera twitch
+            if (sec < 14.5) {
+                camera.position.x = (Math.sin(sec * 40) * 0.08);
+            } else {
+                camera.position.x = 0;
+            }
+        } else {
+            cardBaseline.classList.remove('glitch-active');
+            warningBox.classList.remove('show');
+            camera.position.x = 0;
+        }
+
+        // 0:18 - Cut to black before Scene 2
+        if (sec >= 18.0) {
+            scene1Cont.style.opacity = '0';
+        }
+
+    } else {
+        // === SCENE 2 (0:20 - 0:48) ===
+        scene1Cont.style.opacity = '0';
+        scene2Cont.style.opacity = '1';
+        chartGroup.visible = true;
+
+        const s2_t = sec - 20.0; // 0 to 28s
+
+        // 3D Camera flyover along the stock chart
+        camera.position.x = Math.sin(s2_t * 0.12) * 1.5;
+        camera.position.y = 1.8 + Math.sin(s2_t * 0.08) * 0.4;
+        camera.position.z = 11 - (s2_t * 0.1);
+        camera.lookAt(0, 0.8, 0);
+
+        chartGroup.rotation.y = s2_t * 0.02;
+
+        // 0:24 (s2_t >= 4.0) - Paper title glides down
+        if (s2_t >= 3.5) {
+            paperHeader.style.transform = 'translateY(0)';
+            paperHeader.style.opacity = '1';
+        }
+
+        // 0:33 (s2_t >= 13.0) - Question box scales in
+        if (s2_t >= 12.5) {
+            questionBox.style.transform = 'scale(1)';
+            questionBox.style.opacity = '1';
+        }
+
+        // 0:40 (s2_t >= 20.0) - Navigation timeline reveals
+        if (s2_t >= 19.5) {
+            navTimeline.style.transform = 'translateY(0)';
+            navTimeline.style.opacity = '1';
+        }
+    }
+
+    renderer.render(scene, camera);
+};
+
+// Initial state
+window.setTime(0);
+</script>
+</body>
+</html>

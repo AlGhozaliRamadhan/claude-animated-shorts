@@ -1,0 +1,54 @@
+# === Dependencies ===
+node_modules/
+
+# === Build / cache ===
+engine/out/
+out/
+.cache/
+__pycache__/
+*.pyc
+
+# === Downloaded assets ===
+kenney-*.zip
+
+# === Render outputs (huge MP4/WAV, re-renderable) ===
+projects/*/render/**/*.mp4
+projects/*/render/**/*.wav
+projects/*/render/**/*.mp3
+projects/*/*.mp4
+
+# === QA screenshots (regenerable from source) ===
+projects/*/aset/qa_*/
+projects/*/aset/frames_v3/
+projects/*/aset/stills_v3/
+projects/*/aset/video_stills/
+projects/*/aset/temp_rec/
+projects/*/render/qa*/
+projects/*/render/check/
+projects/*/render/final_frames/
+
+# === Audio assets (voiceover, SFX - local only) ===
+projects/*/aset/vo/
+projects/*/aset/vo_test/
+projects/*/aset/*.wav
+projects/*/aset/*.mp3
+projects/*/render/audio/
+
+# === Reference frames in projects (large PNGs, local study only) ===
+projects/*/reference-frames/
+projects/*/aset/sevilla/
+
+# === References (private study material, AGENTS.md says do not upload) ===
+references/
+
+# === Typography template video (too large) ===
+templates/Typography lyrics music video/*.mp4
+
+# === Editor / OS junk ===
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/

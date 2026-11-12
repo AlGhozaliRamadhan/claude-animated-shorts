@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Editorial Motion Design - Scene 1 & 2</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    background: #111111;
+    color: #F4F4F5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    position: relative;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle architectural grain & hairline frame */
+.outer-frame {
+    position: absolute;
+    top: 40px; left: 50px; right: 50px; bottom: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    pointer-events: none;
+    z-index: 100;
+}
+.frame-corner {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-color: rgba(255, 255, 255, 0.3);
+    border-style: solid;
+}
+.fc-tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+.fc-tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+.fc-bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+.fc-br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+/* Top Metadata Bar */
+.top-meta {
+    position: absolute;
+    top: 60px; left: 80px; right: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 2.5px;
+    color: #71717A;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    padding-bottom: 18px;
+    z-index: 50;
+}
+.meta-left { display: flex; align-items: center; gap: 16px; }
+.meta-dot {
+    width: 6px; height: 6px;
+    background: #FFFFFF;
+    border-radius: 50%;
+}
+
+/* === SCENE 1 === */
+#scene1 {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease;
+}
+
+.scene1-grid {
+    display: grid;
+    grid-template-columns: 1fr 140px 1fr;
+    align-items: center;
+    width: 1400px;
+    margin-top: 40px;
+}
+
+/* Typographic Monolith Cards */
+.card {
+    background: #18181B;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 48px 54px;
+    position: relative;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-tag {
+    font-size: 14px;
+    letter-spacing: 3px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #A1A1AA;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.card-tag::before {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: #A1A1AA;
+    border-radius: 2px;
+}
+
+.hybrid-card {
+    border-color: rgba(255, 255, 255, 0.25);
+    background: #1A1A1E;
+}
+.hybrid-card .card-tag { color: #FFFFFF; }
+.hybrid-card .card-tag::before { background: #FFFFFF; }
+
+.stat-block {
+    margin-bottom: 28px;
+}
+.stat-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #71717A;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+}
+.stat-number {
+    font-size: 88px;
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -2px;
+    color: #FFFFFF;
+}
+
+.stat-sub {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 22px;
+}
+.stat-sub-label {
+    font-size: 13px;
+    color: #71717A;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+.stat-sub-val {
+    font-size: 26px;
+    font-weight: 600;
+    color: #D4D4D8;
+}
+
+/* 5x Center Separator */
+.multiplier-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+.mult-line {
+    width: 1px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.15);
+}
+.mult-badge {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    color: #111111;
+    font-size: 28px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 16px 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    letter-spacing: -0.5px;
+}
+
+/* Anomaly Stamp & Fracture */
+.baseline-card.anomaly {
+    border-color: #DC2626 !important;
+    background: #1C1214 !important;
+}
+.baseline-card.anomaly .stat-number {
+    color: #DC2626 !important;
+}
+.baseline-card.anomaly .card-tag {
+    color: #DC2626 !important;
+}
+.baseline-card.anomaly .card-tag::before {
+    background: #DC2626 !important;
+}
+
+.stamp-box {
+    position: absolute;
+    bottom: -54px;
+    left: 20px; right: 20px;
+    background: #DC2626;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    border-radius: 4px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s ease;
+}
+.stamp-box.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* === SCENE 2 (EDITORIAL KINETIC PAPER) === */
+#scene2 {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #FBFBFA; /* Warm Crisp Editorial Paper */
+    color: #18181B;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 110px 120px 90px 120px;
+}
+
+#scene2 .top-meta-white {
+    position: absolute;
+    top: 60px; left: 80px; right: 80px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: #71717A;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding-bottom: 18px;
+}
+
+.s2-header {
+    border-left: 4px solid #18181B;
+    padding-left: 28px;
+    margin-bottom: 30px;
+}
+.s2-kicker {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: #71717A;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+.s2-title {
+    font-size: 38px;
+    font-weight: 800;
+    color: #09090B;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin-bottom: 8px;
+}
+.s2-meta {
+    font-size: 17px;
+    color: #52525B;
+    font-weight: 400;
+}
+
+/* Central Research Question Hero */
+.s2-question-hero {
+    margin: 30px 0;
+    padding: 50px 60px;
+    background: #FFFFFF;
+    border: 1px solid #E4E4E7;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.04);
+}
+.q-rubric {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #A1A1AA;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+.q-headline {
+    font-size: 46px;
+    font-weight: 800;
+    color: #09090B;
+    line-height: 1.22;
+    letter-spacing: -0.8px;
+}
+
+/* 4 Navigation Pillars (Clean, Architectural) */
+.s2-nav-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+.nav-card {
+    background: #FFFFFF;
+    border: 1px solid #E4E4E7;
+    border-radius: 8px;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 130px;
+    transition: all 0.3s ease;
+}
+.nav-card.active {
+    border-color: #09090B;
+    background: #18181B;
+    color: #FFFFFF;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+}
+.nav-idx {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #71717A;
+}
+.nav-card.active .nav-idx { color: #A1A1AA; }
+.nav-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+.nav-desc {
+    font-size: 13px;
+    color: #71717A;
+    font-weight: 500;
+}
+.nav-card.active .nav-desc { color: #D4D4D8; }
+</style>
+</head>
+<body>
+
+<div class="outer-frame">
+    <div class="frame-corner fc-tl"></div>
+    <div class="frame-corner fc-tr"></div>
+    <div class="frame-corner fc-bl"></div>
+    <div class="frame-corner fc-br"></div>
+</div>
+
+<!-- SCENE 1 (STARK ARCHITECTURAL CHARCOAL) -->
+<div id="scene1">
+    <div class="top-meta">
+        <div class="meta-left">
+            <div class="meta-dot"></div>
+            <span>TELAAH KRITIS • KELOMPOK 15.3B.01</span>
+        </div>
+        <div>BENCHMARK HASIL: TABEL 4</div>
+    </div>
+
+    <div class="scene1-grid">
+        <!-- Hybrid Model -->
+        <div class="card hybrid-card">
+            <div class="card-tag">MODEL HYBRID (LSTM-GARCH)</div>
+            <div class="stat-block">
+                <div class="stat-label">Mean Absolute Error</div>
+                <div class="stat-number">1,72</div>
+            </div>
+            <div class="stat-sub">
+                <span class="stat-sub-label">RMSE</span>
+                <span class="stat-sub-val">2,26</span>
+            </div>
+        </div>
+
+        <!-- 5x Separator -->
+        <div class="multiplier-col">
+            <div class="mult-line"></div>
+            <div class="mult-badge">5×</div>
+            <div class="mult-line"></div>
+        </div>
+
+        <!-- Baseline Model -->
+        <div class="card baseline-card" id="card-base">
+            <div class="card-tag">PEMBANDING (LSTM MURNI)</div>
+            <div class="stat-block">
+                <div class="stat-label">Mean Absolute Error</div>
+                <div class="stat-number" id="num-base">9,15</div>
+            </div>
+            <div class="stat-sub">
+                <span class="stat-sub-label">RMSE</span>
+                <span class="stat-sub-val">6,72</span>
+            </div>
+            <div class="stamp-box" id="stamp-box">
+                TIDAK SAHIH • SECARA MATEMATIS MUSTAHIL (MAE > RMSE)
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SCENE 2 (EDITORIAL CRISP PAPER) -->
+<div id="scene2">
+    <div class="top-meta-white">
+        <div>KELOMPOK DATA SAINS 15.3B.01 • MARGONDA 2026</div>
+        <div>BABAK I — IDENTIFIKASI & PERTANYAAN RISET</div>
+    </div>
+
+    <div class="s2-header">
+        <div class="s2-kicker">Karya Ilmiah yang Ditelaah</div>
+        <div class="s2-title">Prediksi Harga Saham NVIDIA Menggunakan Model LSTM dan GARCH</div>
+        <div class="s2-meta">Ferry Mulyanto Syach, Tubagus Baidawi, & Jaka Sundari (2026) • Jurnal SINTA: Vol. 3, No. 2, hlm. 71–79</div>
+    </div>
+
+    <div class="s2-question-hero">
+        <div class="q-rubric">Pertanyaan Inti yang Memandu Review</div>
+        <div class="q-headline">“Apakah menambahkan volatilitas GARCH benar-benar membuat LSTM lebih akurat, dan apakah buktinya bisa dipercaya?”</div>
+    </div>
+
+    <div class="s2-nav-row">
+        <div class="nav-card active">
+            <div>
+                <div class="nav-idx">LANGKAH 01</div>
+                <div class="nav-title">KONSEP</div>
+            </div>
+            <div class="nav-desc">Alur GARCH & LSTM</div>
+        </div>
+        <div class="nav-card">
+            <div>
+                <div class="nav-idx">LANGKAH 02</div>
+                <div class="nav-title">METODE</div>
+            </div>
+            <div class="nav-desc">Split 80:20 Kronologis</div>
+        </div>
+        <div class="nav-card">
+            <div>
+                <div class="nav-idx">LANGKAH 03</div>
+                <div class="nav-title">HASIL</div>
+            </div>
+            <div class="nav-desc">Tabel 4 & Anomali Angka</div>
+        </div>
+        <div class="nav-card">
+            <div>
+                <div class="nav-idx">LANGKAH 04</div>
+                <div class="nav-title">EVALUASI</div>
+            </div>
+            <div class="nav-desc">Audit Enam Celah Metodologi</div>
+        </div>
+    </div>
+</div>
+
+<script>
+window.setMode = function(mode) {
+    const s1 = document.getElementById('scene1');
+    const s2 = document.getElementById('scene2');
+    const cardBase = document.getElementById('card-base');
+    const stampBox = document.getElementById('stamp-box');
+
+    if (mode === 'scene1_normal') {
+        s1.style.opacity = '1';
+        s2.style.opacity = '0';
+        cardBase.classList.remove('anomaly');
+        stampBox.classList.remove('show');
+    } else if (mode === 'scene1_glitch') {
+        s1.style.opacity = '1';
+        s2.style.opacity = '0';
+        cardBase.classList.add('anomaly');
+        stampBox.classList.add('show');
+    } else if (mode === 'scene2') {
+        s1.style.opacity = '0';
+        s2.style.opacity = '1';
+    }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "name": "claude-animated-shorts-engine",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Remotion workspace for the bridge-style three.js animated short pipeline",
+  "scripts": {
+    "dev": "remotion studio src/index.ts",
+    "compositions": "remotion compositions src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "still": "python ../scripts/render_remotion.py --still",
+    "render": "python ../scripts/render_remotion.py",
+    "doctor": "python ../scripts/doctor.py"
+  },
+  "dependencies": {
+    "@react-three/fiber": "9.2.0",
+    "@react-three/postprocessing": "3.0.4",
+    "@remotion/three": "4.0.540",
+    "postprocessing": "6.37.8",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.540",
+    "three": "0.178.0"
+  },
+  "devDependencies": {
+    "@remotion/cli": "4.0.540",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/three": "0.178.0",
+    "typescript": "5.9.3"
+  }
+}

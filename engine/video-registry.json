@@ -1,0 +1,64 @@
+{
+  "videos": [
+    {
+      "id": "BridgeShort",
+      "dir": "bridge",
+      "module": "Bridge",
+      "component": "BridgeShort",
+      "framesExport": "BRIDGE_FRAMES",
+      "fps": 30,
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "id": "Example30s",
+      "dir": "example-30s",
+      "module": "Excerpt",
+      "component": "Example30s",
+      "framesExport": "EXAMPLE_FRAMES",
+      "fps": 30,
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "id": "FifaColdOpen",
+      "dir": "fifa-posisi-5min",
+      "module": "TypeTest",
+      "component": "FifaColdOpen",
+      "framesExport": "COLD_OPEN_FRAMES",
+      "fps": 30,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "id": "FifaVideo1",
+      "dir": "fifa-posisi-5min",
+      "module": "Video1",
+      "component": "FifaVideo1",
+      "framesExport": "VIDEO1_FRAMES",
+      "fps": 30,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "id": "FifaVideo2",
+      "dir": "fifa-posisi-5min",
+      "module": "Video2",
+      "component": "FifaVideo2",
+      "framesExport": "VIDEO2_FRAMES",
+      "fps": 30,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "id": "FifaVideo3",
+      "dir": "fifa-posisi-5min",
+      "module": "Video3",
+      "component": "FifaVideo3",
+      "framesExport": "VIDEO3_FRAMES",
+      "fps": 30,
+      "width": 1920,
+      "height": 1080
+    }
+  ]
+}

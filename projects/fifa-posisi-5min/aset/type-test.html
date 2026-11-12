@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cold open test: FIFA 23 position classification</title>
+<link rel="stylesheet" href="fonts/fonts-local.css" />
+<style>
+  :root {
+    --bone: #ECECE7;
+    --ink: #0C0C0C;
+    --paper: #F4F1EA;
+    --brass: #A9781C;
+    --alert: #B32223;
+    --muted: #6F6A61;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; width: 1920px; height: 1080px; overflow: hidden;
+    background: var(--bone);
+  }
+  #stage {
+    position: relative; width: 1920px; height: 1080px;
+    overflow: hidden; background: var(--bone);
+    font-family: "Inter Tight", sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  #world {
+    position: absolute; left: 0; top: 0;
+    width: 2600px; height: 1500px;
+    transform-origin: 0 0;
+    background: var(--bone);
+    will-change: transform, filter;
+  }
+  .zone { position: absolute; }
+
+  .mono {
+    font-family: "IBM Plex Mono", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+  .serif {
+    font-family: "Instrument Serif", serif;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  /* ---------- zone A: the question mark ---------- */
+  .q-zone { left: 750px; top: 100px; width: 900px; height: 1000px; }
+  .q-zone svg { width: 900px; height: 1000px; display: block; }
+
+  .seed {
+    position: absolute; left: 1194px; top: 594px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--brass);
+    transform-origin: center center;
+  }
+
+  /* ---------- zone B: ledger ---------- */
+  .ledger-zone { left: 170px; top: 190px; width: 760px; }
+  .ledger-row {
+    display: grid;
+    grid-template-columns: 46px 1fr auto;
+    align-items: baseline;
+    column-gap: 22px;
+    padding: 13px 0;
+  }
+  .ledger-row .idx {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px; letter-spacing: 0.12em;
+    color: rgba(12,12,12,0.36);
+  }
+  .ledger-row .name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 18px; letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .ledger-row .val {
+    font-size: 66px; font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    color: var(--ink);
+    min-width: 92px; text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .ledger-row.strong .name { color: var(--ink); }
+  .ledger-row.strong .val { font-weight: 800; }
+
+  /* ---------- zone C: verdict ---------- */
+  .verdict-zone { left: 1180px; top: 250px; width: 1120px; }
+  .verdict-kicker {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 15px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 18px;
+  }
+  .word-viewport { height: 174px; overflow: hidden; }
+  .word-track { will-change: transform; }
+  .word-track div {
+    height: 174px;
+    font-size: 168px; font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.045em;
+    white-space: nowrap;
+  }
+  .underline {
+    height: 9px; background: var(--brass);
+    transform-origin: 0 50%;
+    margin-top: 12px;
+  }
+  .prob {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 92px; line-height: 1;
+    color: var(--brass);
+    margin-top: 34px;
+    font-variant-numeric: tabular-nums;
+  }
+  .others {
+    display: flex; gap: 58px;
+    margin-top: 26px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 22px; letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .others b { color: var(--ink); font-weight: 500; }
+
+  /* ---------- black scene ---------- */
+  #black {
+    position: absolute; inset: 0;
+    background: var(--ink); color: var(--paper);
+    display: none;
+  }
+  .nameblock {
+    position: absolute; left: 118px; top: 178px;
+    width: 1500px;
+  }
+  .name-mask { overflow: hidden; }
+  .name-line {
+    font-size: 184px; font-weight: 800;
+    line-height: 0.94; letter-spacing: -0.05em;
+    will-change: transform;
+  }
+  .meta {
+    margin-top: 30px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 20px; letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(244,241,234,0.58);
+  }
+  .report { margin-top: 110px; }
+  .report .tag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 14px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--brass);
+    margin-bottom: 16px;
+  }
+  .report .word {
+    font-size: 78px; font-weight: 600;
+    letter-spacing: -0.025em;
+    display: inline-block;
+    border-bottom: 7px solid var(--brass);
+    padding-bottom: 6px;
+  }
+
+  /* ---------- paper scene 2 ---------- */
+  #paper2 {
+    position: absolute; inset: 0;
+    background: var(--bone);
+    display: none;
+  }
+  .thesis { position: absolute; left: 110px; top: 296px; }
+  .thesis .line {
+    font-size: 146px; font-weight: 700;
+    letter-spacing: -0.048em;
+    line-height: 1.02;
+    will-change: transform, opacity;
+  }
+  .thesis .line.dim { color: rgba(12,12,12,0.40); }
+  .thesis .note {
+    margin-top: 78px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 18px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  /* ---------- paper grain ---------- */
+  #grain {
+    position: absolute; inset: 0; pointer-events: none;
+    opacity: 0.05; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='0.55'/></svg>");
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <div id="world">
+    <!-- A: question mark made of data -->
+    <div class="zone q-zone" id="qzone">
+      <svg viewBox="0 0 900 1000" aria-label="Tanda tanya dari baris data">
+        <defs>
+          <mask id="qmask" maskUnits="userSpaceOnUse" x="0" y="0" width="900" height="1000">
+            <text x="450" y="930" text-anchor="middle"
+                  font-family="Archivo Black" font-weight="400"
+                  font-size="1080" fill="#FFFFFF"
+                  transform="translate(450 500) scale(1.1 1.0) translate(-450 -500)">?</text>
+          </mask>
+          <clipPath id="revealClip">
+            <rect id="revealRect" x="450" y="0" width="0" height="1000" />
+          </clipPath>
+        </defs>
+        <g id="qrows" mask="url(#qmask)" clip-path="url(#revealClip)"></g>
+      </svg>
+    </div>
+    <div class="seed" id="seed"></div>
+
+    <!-- B: attribute ledger -->
+    <div class="zone ledger-zone" id="ledger"></div>
+
+    <!-- C: model verdict -->
+    <div class="zone verdict-zone" id="verdict">
+      <div class="verdict-kicker">model memilih</div>
+      <div class="word-viewport">
+        <div class="word-track" id="wordTrack">
+          <div>BEK</div>
+          <div>GELANDANG</div>
+          <div>PENYERANG</div>
+          <div>GELANDANG</div>
+        </div>
+      </div>
+      <div class="underline" id="underline"></div>
+      <div class="prob" id="prob">0,000</div>
+      <div class="others">
+        <span>DEFENDER <b>0,020</b></span>
+        <span>FORWARD <b>0,125</b></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- name reveal -->
+  <div id="black">
+    <div class="nameblock">
+      <div class="name-mask"><div class="name-line" id="n1">ÉRIK</div></div>
+      <div class="name-mask"><div class="name-line" id="n2">LAMELA</div></div>
+      <div class="meta" id="meta">sayap kanan / sevilla / 30 tahun</div>
+      <div class="report" id="report">
+        <div class="tag">posisi di rapor data</div>
+        <div class="word">PENYERANG</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- thesis -->
+  <div id="paper2">
+    <div class="thesis">
+      <div class="line dim" id="t1">Bukan posisi terbaik.</div>
+      <div class="line" id="t2">Posisi yang <span class="serif">tercatat</span>.</div>
+      <div class="note" id="note">model menebak label / bukan menilai potensi</div>
+    </div>
+  </div>
+
+  <div id="grain"></div>
+</div>
+
+<script>
+  window.__duration = 18.0;
+
+  const attrs = [
+    ["FINISHING", 74], ["DRIBBLING", 85], ["SHORTPASSING", 80],
+    ["VISION", 78], ["STANDINGTACKLE", 50], ["SLIDINGTACKLE", 54],
+    ["BALLCONTROL", 84], ["LONGPASSING", 75], ["CROSSING", 79],
+    ["SHOTPOWER", 81], ["INTERCEPTIONS", 53], ["MARKING", 52],
+    ["STAMINA", 69], ["ACCELERATION", 72], ["SPRINTSPEED", 64],
+    ["AGILITY", 82], ["REACTIONS", 80], ["COMPOSURE", 78],
+    ["POSITIONING", 76], ["PENALTIES", 68], ["CURVE", 76],
+    ["FKAACCURACY", 70], ["LONGSHOTS", 72], ["VOLLEYS", 70],
+    ["HEADINGACCURACY", 62], ["JUMPING", 64], ["STRENGTH", 58],
+    ["AGGRESSION", 61], ["BALANCE", 79]
+  ];
+
+  const svgNS = "http://www.w3.org/2000/svg";
+  const group = document.getElementById("qrows");
+  for (let i = 0; i < 100; i++) {
+    const parts = [];
+    for (let k = 0; k < 6; k++) {
+      const [name, value] = attrs[(i + k * 4) % attrs.length];
+      parts.push(`${name} ${value}`);
+    }
+    const text = document.createElementNS(svgNS, "text");
+    text.setAttribute("x", "450");
+    text.setAttribute("y", 76 + i * 9.2);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("font-family", "IBM Plex Mono, monospace");
+    text.setAttribute("font-size", "7.5");
+    text.setAttribute("letter-spacing", "1.2");
+    text.setAttribute("fill", "#0C0C0C");
+    text.textContent = parts.join("  /  ");
+    group.appendChild(text);
+  }
+
+  const ledgerData = [
+    ["Finishing", 74, true],
+    ["Dribbling", 85, true],
+    ["Short passing", 80, true],
+    ["Vision", 78, true],
+    ["Standing tackle", 50, true],
+    ["Sliding tackle", 54, false],
+    ["Crossing", 79, false],
+    ["Shot power", 81, false]
+  ];
+  const ledger = document.getElementById("ledger");
+  const valEls = [];
+  ledgerData.forEach(([name, value, strong], i) => {
+    const row = document.createElement("div");
+    row.className = "ledger-row" + (strong ? " strong" : "");
+    row.innerHTML = `
+      <span class="idx">${String(i + 1).padStart(2, "0")}</span>
+      <span class="name">${name}</span>
+      <span class="val">0</span>`;
+    ledger.appendChild(row);
+    valEls.push(row.querySelector(".val"));
+  });
+
+  const seed = document.getElementById("seed");
+  const qzone = document.getElementById("qzone");
+  const revealRect = document.getElementById("revealRect");
+  const wordTrack = document.getElementById("wordTrack");
+  const underline = document.getElementById("underline");
+  const prob = document.getElementById("prob");
+  const black = document.getElementById("black");
+  const paper2 = document.getElementById("paper2");
+  const world = document.getElementById("world");
+  const n1 = document.getElementById("n1");
+  const n2 = document.getElementById("n2");
+  const meta = document.getElementById("meta");
+  const report = document.getElementById("report");
+  const t1 = document.getElementById("t1");
+  const t2 = document.getElementById("t2");
+  const note = document.getElementById("note");
+
+  const clamp = (x) => Math.max(0, Math.min(1, x));
+  const smooth = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
+  const easeOut = (x) => { x = clamp(x); return 1 - Math.pow(1 - x, 3); };
+  const easeInOut = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+  const lerp = (a, b, p) => a + (b - a) * p;
+
+  // Camera keyframes. s is scale, x/y are the world point at frame centre.
+  const camKeys = [
+    { t: 0.00, x: 1200, y: 600, s: 1.10 },
+    { t: 1.80, x: 1200, y: 600, s: 1.18 },
+    { t: 3.20, x: 1235, y: 600, s: 1.20 },
+    { t: 3.95, x: 900,  y: 700, s: 1.12 },
+    { t: 4.60, x: 560,  y: 650, s: 1.06 },
+    { t: 6.55, x: 615,  y: 650, s: 1.12 },
+    { t: 7.30, x: 1130, y: 660, s: 1.10 },
+    { t: 8.00, x: 1710, y: 645, s: 1.08 },
+    { t: 9.55, x: 1710, y: 645, s: 1.15 }
+  ];
+
+  function camAt(t) {
+    if (t <= camKeys[0].t) return camKeys[0];
+    for (let i = 1; i < camKeys.length; i++) {
+      if (t <= camKeys[i].t) {
+        const a = camKeys[i - 1], b = camKeys[i];
+        const p = easeInOut((t - a.t) / (b.t - a.t));
+        return { x: lerp(a.x, b.x, p), y: lerp(a.y, b.y, p), s: lerp(a.s, b.s, p) };
+      }
+    }
+    return camKeys[camKeys.length - 1];
+  }
+
+  function setWorldCamera(t) {
+    const c = camAt(t);
+    const tx = 960 - c.x * c.s;
+    const ty = 540 - c.y * c.s;
+    const breath = Math.sin(t * 0.62) * 2.2;
+    world.style.transform = `translate(${tx}px, ${ty + breath}px) scale(${c.s})`;
+
+    // motion blur from camera speed
+    const a = camAt(Math.max(0, t - 0.06));
+    const dx = (c.x - a.x) * c.s;
+    const dy = (c.y - a.y) * c.s;
+    const ds = Math.abs(c.s - a.s) * 1200;
+    const speed = Math.hypot(dx, dy) + ds;
+    const blur = Math.min(7, speed * 0.45);
+    world.style.filter = blur > 0.15 ? `blur(${blur.toFixed(2)}px)` : "none";
+  }
+
+  function setQuestion(t) {
+    const grow = smooth((t - 0.10) / 0.55);
+    seed.style.transform = `scale(${0.6 + grow * 1.4})`;
+    seed.style.opacity = String(1 - smooth((t - 0.55) / 0.35));
+
+    const p = easeOut((t - 0.45) / 1.15);
+    const w = 900 * p;
+    revealRect.setAttribute("x", String(450 - w / 2));
+    revealRect.setAttribute("width", String(w));
+    qzone.style.opacity = String(1 - smooth((t - 3.55) / 0.55));
+  }
+
+  function setLedger(t) {
+    const start = 4.55, dur = 1.05;
+    valEls.forEach((el, i) => {
+      const p = easeOut((t - start - i * 0.045) / dur);
+      el.textContent = String(Math.round(ledgerData[i][1] * p));
+    });
+    const lift = smooth((t - 4.55) / 0.55);
+    ledger.style.transform = `translateY(${(1 - lift) * 22}px)`;
+    ledger.style.opacity = String(lift);
+  }
+
+  function setVerdict(t) {
+    let idx = 0;
+    if (t >= 7.12) idx = 1;
+    if (t >= 7.48) idx = 2;
+    if (t >= 7.86) idx = 3;
+    const y = -idx * 174;
+    wordTrack.style.transform = `translateY(${y}px)`;
+
+    const up = smooth((t - 7.88) / 0.42);
+    underline.style.transform = `scaleX(${up})`;
+
+    const p = easeOut((t - 7.95) / 0.95);
+    prob.textContent = (0.855 * p).toFixed(3).replace(".", ",");
+
+    const lift = smooth((t - 7.10) / 0.55);
+    document.getElementById("verdict").style.opacity = String(lift);
+  }
+
+  function setBlack(t) {
+    const on = t >= 9.55 && t < 12.62;
+    black.style.display = on ? "block" : "none";
+    if (!on) return;
+
+    const a = smooth((t - 9.62) / 0.55);
+    const b = smooth((t - 9.80) / 0.55);
+    n1.style.transform = `translateY(${(1 - a) * 108}%)`;
+    n2.style.transform = `translateY(${(1 - b) * 108}%)`;
+
+    const m = smooth((t - 10.30) / 0.45);
+    meta.style.opacity = String(m);
+    meta.style.transform = `translateY(${(1 - m) * 14}px)`;
+
+    const r = smooth((t - 10.85) / 0.50);
+    report.style.opacity = String(r);
+    report.style.transform = `translateY(${(1 - r) * 26}px)`;
+
+    // slow push-in on the black card
+    const sc = 1.0 + 0.035 * smooth((t - 9.55) / 3.0);
+    document.querySelector(".nameblock").style.transform = `scale(${sc})`;
+    document.querySelector(".nameblock").style.transformOrigin = "20% 40%";
+  }
+
+  function setPaper2(t) {
+    const on = t >= 12.62;
+    paper2.style.display = on ? "block" : "none";
+    if (!on) return;
+
+    const a = smooth((t - 12.70) / 0.55);
+    const b = smooth((t - 12.86) / 0.55);
+    t1.style.transform = `translateY(${(1 - a) * 70}px)`;
+    t1.style.opacity = String(a);
+    t2.style.transform = `translateY(${(1 - b) * 70}px)`;
+    t2.style.opacity = String(b);
+
+    const n = smooth((t - 13.60) / 0.45);
+    note.style.opacity = String(n);
+    note.style.transform = `translateY(${(1 - n) * 16}px)`;
+
+    // slow pull-out
+    const sc = 1.055 - 0.055 * smooth((t - 12.62) / 3.2);
+    document.querySelector(".thesis").style.transform = `scale(${sc})`;
+    document.querySelector(".thesis").style.transformOrigin = "0% 20%";
+  }
+
+  window.setTime = function (t) {
+    setWorldCamera(t);
+    setQuestion(t);
+    setLedger(t);
+    setVerdict(t);
+    setBlack(t);
+    setPaper2(t);
+    black.style.display = (t >= 9.55 && t < 12.62) ? "block" : "none";
+    paper2.style.display = (t >= 12.62) ? "block" : "none";
+    world.style.opacity = (t >= 9.55) ? "0" : "1";
+  };
+
+  window.setTime(0);
+  document.fonts.ready.then(() => window.setTime(window.__t || 0));
+</script>
+</body>
+</html>
